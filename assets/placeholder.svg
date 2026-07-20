@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Huzur Dekor">
+  <rect width="800" height="600" fill="#f0e9dc"/>
+  <rect x="24" y="24" width="752" height="552" fill="none" stroke="#cfa858" stroke-width="2"/>
+  <!-- monogram -->
+  <g transform="translate(300 170) scale(1)">
+    <path d="M 52 92 L 106 46 L 160 92" fill="none" stroke="#b8892f" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/>
+    <rect x="54" y="62" width="16" height="98" fill="#2e2e2e" opacity="0.45"/>
+    <rect x="104" y="82" width="14" height="78" fill="#b8892f" opacity="0.55"/>
+    <rect x="70" y="114" width="34" height="11" fill="#2e2e2e" opacity="0.45"/>
+  </g>
+  <text x="400" y="420" text-anchor="middle" font-family="Georgia, serif" font-size="42" letter-spacing="8" fill="#2e2e2e" opacity="0.55">HUZUR DEKOR</text>
+  <g transform="translate(400 465)" fill="none" stroke="#b8892f" stroke-width="2" stroke-linecap="round" opacity="0.6">
+    <path d="M -60 0 H -12 M 12 0 H 60 M 0 -6 q 6 6 0 12 q -6 -6 0 -12"/>
+  </g>
+</svg>

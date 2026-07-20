@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Huzur Dekor">
+  <circle cx="100" cy="100" r="97" fill="#f7f2e9"/>
+  <circle cx="100" cy="100" r="90" fill="none" stroke="#b8892f" stroke-width="3"/>
+  <!-- roof -->
+  <path d="M 52 92 L 106 46 L 160 92" fill="none" stroke="#b8892f" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 146 80 L 146 60 L 158 60 L 158 88" fill="#b8892f" stroke="none"/>
+  <!-- H letterform -->
+  <rect x="54" y="62" width="16" height="98" fill="#2e2e2e"/>
+  <rect x="104" y="82" width="14" height="78" fill="#b8892f"/>
+  <rect x="70" y="114" width="34" height="11" fill="#2e2e2e"/>
+  <!-- base line -->
+  <path d="M 74 160 L 146 160" stroke="#2e2e2e" stroke-width="5" stroke-linecap="round"/>
+</svg>
