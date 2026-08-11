@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>لوحة التحكم — Huzur Dekor</title>
+<link rel="icon" href="../../assets/logo-mark.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#f7f2e9; --cream-deep:#f0e9dc; --white:#fffdf9;
+  --ink:#2e2e2e; --ink-soft:#5c5850;
+  --gold:#b8892f; --gold-soft:#cfa858; --gold-faint:rgba(184,137,47,.13);
+  --line:rgba(46,46,46,.12);
+  --ok:#2f8f4e; --warn:#c2851b;
+  --shadow:0 18px 50px -18px rgba(46,40,26,.22);
+  --radius:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{color-scheme:light only}
+body{
+  font-family:"Tajawal",system-ui,sans-serif;
+  background:var(--cream); color:var(--ink);
+  line-height:1.7; -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea,select{font-family:inherit;font-size:.95rem;color:inherit}
+
+/* ── login ── */
+.gate{
+  position:fixed; inset:0; z-index:200;
+  display:grid; place-items:center; padding:1.5rem;
+  background:radial-gradient(circle at 50% 0%, #fff 0%, var(--cream) 55%);
+}
+.gate-card{
+  width:min(420px,100%); background:var(--white);
+  border:1px solid var(--line); border-radius:22px;
+  padding:2.6rem 2rem; text-align:center; box-shadow:var(--shadow);
+}
+.gate-card img{width:76px;margin:0 auto 1.1rem}
+.gate-card h1{font-size:1.35rem;font-weight:700;margin-bottom:.3rem}
+.gate-card p{color:var(--ink-soft);font-size:.92rem;margin-bottom:1.6rem}
+.field{
+  width:100%; padding:.8rem 1rem; border:1.5px solid var(--line);
+  border-radius:12px; background:var(--cream); outline:none;
+  transition:border-color .2s ease, box-shadow .2s ease;
+}
+.field:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-faint)}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+  padding:.75rem 1.5rem; border-radius:999px; font-weight:600; font-size:.95rem;
+  transition:transform .2s ease, box-shadow .2s ease, background .2s ease, opacity .2s ease;
+}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-soft));color:#fff;
+  box-shadow:0 10px 24px -10px rgba(184,137,47,.65)}
+.btn-gold:hover{transform:translateY(-2px)}
+.btn-ghost{border:1.5px solid var(--gold);color:var(--gold)}
+.btn-ghost:hover{background:var(--gold-faint)}
+.btn-plain{border:1.5px solid var(--line);color:var(--ink-soft)}
+.btn-plain:hover{border-color:var(--ink-soft)}
+.btn-full{width:100%;margin-top:1rem}
+.gate-err{color:#b3261e;font-size:.88rem;margin-top:.8rem;min-height:1.2rem}
+
+/* ── shell ── */
+.shell{display:none;min-height:100vh;flex-direction:column}
+.shell.on{display:flex}
+
+.topbar{
+  position:sticky;top:0;z-index:60;
+  display:flex;align-items:center;gap:1rem;flex-wrap:wrap;
+  padding:.7rem clamp(.9rem,3vw,1.6rem);
+  background:rgba(247,242,233,.92); backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.topbar-brand{display:flex;align-items:center;gap:.6rem;font-weight:700}
+.topbar-brand img{width:38px}
+.topbar-brand small{display:block;font-weight:500;font-size:.72rem;color:var(--gold);letter-spacing:.2em;font-family:"Jost",sans-serif}
+.topbar-actions{display:flex;gap:.6rem;margin-inline-start:auto;flex-wrap:wrap}
+.topbar-actions .btn{padding:.6rem 1.1rem;font-size:.88rem}
+
+.notice{
+  display:flex;gap:.7rem;align-items:flex-start;
+  padding:.85rem clamp(.9rem,3vw,1.6rem);
+  background:#fdf6e4;border-bottom:1px solid rgba(184,137,47,.25);
+  font-size:.88rem;color:#6b5520;
+}
+.notice svg{width:19px;height:19px;flex:none;margin-top:.2rem;color:var(--gold)}
+
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.85fr);gap:0;flex:1;min-height:0}
+.editor{padding:1.2rem clamp(.9rem,3vw,1.6rem) 4rem;overflow-y:auto}
+.preview-pane{
+  position:sticky;top:0;align-self:start;height:100vh;
+  border-inline-start:1px solid var(--line);
+  background:var(--cream-deep);
+  display:flex;flex-direction:column;
+}
+
+/* ── tabs ── */
+.tabs{display:flex;gap:.45rem;flex-wrap:wrap;margin-bottom:1.4rem}
+.tab{
+  padding:.5rem 1rem;border-radius:999px;font-size:.9rem;font-weight:500;
+  border:1.5px solid var(--line);background:var(--white);color:var(--ink-soft);
+  transition:all .22s ease;
+}
+.tab:hover{border-color:var(--gold-soft)}
+.tab.active{background:linear-gradient(135deg,var(--gold),var(--gold-soft));color:#fff;border-color:transparent;
+  box-shadow:0 8px 18px -10px rgba(184,137,47,.7)}
+
+.panel{display:none;animation:fade .3s ease}
+.panel.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.card{
+  background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.3rem 1.3rem 1.5rem;margin-bottom:1.1rem;
+}
+.card-head{display:flex;align-items:center;gap:.6rem;margin-bottom:1rem}
+.card-head h2{font-size:1.05rem;font-weight:700}
+.card-head span{font-size:.82rem;color:var(--ink-soft);font-weight:400}
+.card-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex:none}
+
+.row{margin-bottom:1rem}
+.row:last-child{margin-bottom:0}
+.row label{display:block;font-size:.85rem;font-weight:500;margin-bottom:.35rem;color:var(--ink-soft)}
+.row .field{width:100%}
+textarea.field{resize:vertical;min-height:78px;line-height:1.6}
+
+.bi{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.bi .tag{
+  display:inline-block;font-size:.7rem;font-weight:600;padding:.1rem .5rem;
+  border-radius:999px;margin-inline-end:.35rem;font-family:"Jost",sans-serif;
+}
+.tag-tr{background:#e6efe8;color:#2f6b45}
+.tag-ar{background:var(--gold-faint);color:var(--gold)}
+
+/* ── image rows ── */
+.img-row{
+  display:flex;gap:1rem;align-items:center;
+  padding:.9rem;border:1px solid var(--line);border-radius:14px;
+  margin-bottom:.8rem;background:var(--cream);
+}
+.img-thumb{
+  width:96px;height:72px;flex:none;border-radius:10px;overflow:hidden;
+  background:var(--cream-deep);border:1px solid var(--line);
+  display:grid;place-items:center;
+}
+.img-thumb img{width:100%;height:100%;object-fit:contain}
+.img-thumb.cover img{object-fit:cover}
+.img-info{flex:1;min-width:0}
+.img-info strong{display:block;font-size:.92rem;margin-bottom:.15rem}
+.img-info small{color:var(--ink-soft);font-size:.78rem;word-break:break-all}
+.img-actions{display:flex;flex-direction:column;gap:.4rem;flex:none}
+.img-actions .btn{padding:.42rem .9rem;font-size:.8rem}
+input[type=file]{display:none}
+
+/* ── colours ── */
+.colors{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.9rem}
+.color-item{text-align:center}
+.color-item label{display:block;font-size:.82rem;margin-bottom:.45rem;color:var(--ink-soft)}
+.color-item input[type=color]{
+  width:100%;height:52px;border:1px solid var(--line);border-radius:12px;
+  background:none;cursor:pointer;padding:3px;
+}
+
+/* ── preview ── */
+.preview-head{
+  display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;
+  padding:.7rem 1rem;border-bottom:1px solid var(--line);background:var(--white);
+}
+.preview-head strong{font-size:.9rem}
+.seg{display:flex;gap:.25rem;background:var(--cream-deep);padding:3px;border-radius:999px;margin-inline-start:auto}
+.seg button{padding:.32rem .8rem;border-radius:999px;font-size:.8rem;font-weight:600;color:var(--ink-soft)}
+.seg button.on{background:var(--white);color:var(--gold);box-shadow:0 2px 6px -2px rgba(46,40,26,.25)}
+.preview-body{flex:1;display:grid;place-items:center;padding:1rem;overflow:hidden}
+.frame-wrap{
+  height:100%;width:100%;display:grid;place-items:center;
+  transition:width .35s ease;
+}
+.frame-wrap.phone{width:390px;max-width:100%}
+iframe{
+  width:100%;height:100%;border:1px solid var(--line);border-radius:14px;
+  background:var(--white);box-shadow:var(--shadow);
+}
+.frame-wrap.phone iframe{border-radius:26px;height:min(100%,780px)}
+
+/* ── toast ── */
+.toast{
+  position:fixed;bottom:1.4rem;left:50%;
+  transform:translate(-50%,180%);opacity:0;visibility:hidden;
+  background:var(--ink);color:var(--cream);padding:.8rem 1.5rem;border-radius:999px;
+  font-size:.9rem;z-index:300;max-width:calc(100% - 2rem);text-align:center;
+  transition:transform .35s cubic-bezier(.22,1,.36,1),opacity .25s ease,visibility .25s;
+  box-shadow:0 18px 40px -16px rgba(0,0,0,.5);
+}
+.toast.on{transform:translate(-50%,0);opacity:1;visibility:visible}
+
+.size-pill{
+  font-size:.78rem;color:var(--ink-soft);
+  background:var(--cream-deep);padding:.3rem .8rem;border-radius:999px;
+}
+.size-pill.warn{background:#fdf0d8;color:var(--warn);font-weight:600}
+
+.helper{font-size:.82rem;color:var(--ink-soft);margin-top:.5rem;line-height:1.6}
+code{background:var(--cream-deep);padding:.12rem .4rem;border-radius:6px;font-size:.85em}
+
+@media(max-width:1000px){
+  .workspace{grid-template-columns:1fr}
+  .preview-pane{position:relative;height:70vh;border-inline-start:none;border-top:1px solid var(--line)}
+  .bi{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ Login ══════════ -->
+<div class="gate" id="gate">
+  <form class="gate-card" id="gateForm">
+    <img src="../../assets/logo-mark.svg" alt="">
+    <h1>لوحة تحكم Huzur Dekor</h1>
+    <p>أدخل كلمة المرور للمتابعة</p>
+    <input type="password" class="field" id="pw" placeholder="كلمة المرور" autocomplete="current-password">
+    <div class="gate-err" id="gateErr"></div>
+    <button class="btn btn-gold btn-full" type="submit">دخول</button>
+  </form>
+</div>
+
+<!-- ══════════ Shell ══════════ -->
+<div class="shell" id="shell">
+
+  <div class="topbar">
+    <div class="topbar-brand">
+      <img src="../../assets/logo-mark.svg" alt="">
+      <div>لوحة التحكم<small>HUZUR DEKOR</small></div>
+    </div>
+    <div class="topbar-actions">
+      <span class="size-pill" id="sizePill">—</span>
+      <button class="btn btn-plain" id="importBtn">استيراد ملف</button>
+      <button class="btn btn-plain" id="resetBtn">استعادة الأصل</button>
+      <button class="btn btn-gold" id="saveBtn">💾 حفظ ونشر</button>
+    </div>
+  </div>
+
+  <div class="notice">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+    <div>
+      تعديلاتك تظهر في المعاينة فوراً، لكنها <strong>لا تظهر للزوار</strong> حتى تضغط «حفظ ونشر» ثم ترفع الملف <code>content.json</code> إلى مجلد الموقع الرئيسي (بجوار <code>index.html</code>) — استبدل القديم به.
+    </div>
+  </div>
+
+  <div class="workspace">
+    <!-- ── Editor ── -->
+    <div class="editor">
+      <div class="tabs" id="tabs">
+        <button class="tab active" data-tab="texts">✍️ النصوص</button>
+        <button class="tab" data-tab="images">🖼️ الصور والشعار</button>
+        <button class="tab" data-tab="meta">🌐 التاب وجوجل</button>
+        <button class="tab" data-tab="contact">📞 التواصل</button>
+        <button class="tab" data-tab="colors">🎨 الألوان</button>
+        <button class="tab" data-tab="security">🔒 كلمة المرور</button>
+      </div>
+
+      <div class="panel active" data-panel="texts" id="textsPanel"></div>
+
+      <div class="panel" data-panel="images">
+        <div class="card">
+          <div class="card-head"><span class="card-dot"></span><h2>الشعار</h2></div>
+          <div id="logoRows"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-dot"></span><h2>صور المعرض</h2><span>ستة أعمال</span></div>
+          <div id="galleryRows"></div>
+          <p class="helper">الصور تُصغَّر تلقائياً لتبقى سريعة التحميل. الحجم المثالي عرضي (أفقي).</p>
+        </div>
+      </div>
+
+      <div class="panel" data-panel="meta">
+        <div class="card">
+          <div class="card-head"><span class="card-dot"></span><h2>أيقونة التاب والمشاركة</h2></div>
+          <div id="metaImgRows"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-dot"></span><h2>عنوان الصفحة ووصفها</h2><span>ما يظهر في جوجل وتاب المتصفح</span></div>
+          <div class="row"><label>عنوان التاب — تركي</label><input class="field" data-meta="titleTr"></div>
+          <div class="row"><label>عنوان التاب — عربي</label><input class="field" data-meta="titleAr"></div>
+          <div class="row"><label>الوصف في جوجل — تركي</label><textarea class="field" data-meta="descTr"></textarea></div>
+          <div class="row"><label>الوصف في جوجل — عربي</label><textarea class="field" data-meta="descAr"></textarea></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-dot"></span><h2>اسم العلامة</h2></div>
+          <div class="row"><label>الاسم الكبير (في الترويسة)</label><input class="field" data-brand="name"></div>
+          <div class="row"><label>الكلمة الصغيرة تحته</label><input class="field" data-brand="sub"></div>
+          <div class="row"><label>الاسم الكامل (في التذييل)</label><input class="field" data-brand="full"></div>
+        </div>
+      </div>
+
+      <div class="panel" data-panel="contact">
+        <div class="card">
+          <div class="card-head"><span class="card-dot"></span><h2>بيانات التواصل</h2></div>
+          <div class="row"><label>الرقم كما يظهر للزائر</label><input class="field" data-contact="phoneDisplay" dir="ltr"></div>
+          <div class="row"><label>الرقم لواتساب والاتصال (أرقام فقط مع كود الدولة)</label><input class="field" data-contact="phoneRaw" dir="ltr" inputmode="numeric"></div>
+          <div class="row"><label>البريد الإلكتروني</label><input class="field" data-contact="email" dir="ltr"></div>
+          <div class="row"><label>حساب إنستغرام (بدون @)</label><input class="field" data-contact="instagram" dir="ltr"></div>
+          <p class="helper">مثال للرقم: <code>905454144617</code> — بدون + ولا مسافات.</p>
+        </div>
+      </div>
+
+      <div class="panel" data-panel="colors">
+        <div class="card">
+          <div class="card-head"><span class="card-dot"></span><h2>ألوان الموقع</h2></div>
+          <div class="colors">
+            <div class="color-item"><label>الذهبي الأساسي</label><input type="color" data-theme="gold"></div>
+            <div class="color-item"><label>الذهبي الفاتح</label><input type="color" data-theme="goldSoft"></div>
+            <div class="color-item"><label>الخلفية الكريمية</label><input type="color" data-theme="cream"></div>
+            <div class="color-item"><label>خلفية الأقسام</label><input type="color" data-theme="creamDeep"></div>
+            <div class="color-item"><label>لون النص</label><input type="color" data-theme="ink"></div>
+          </div>
+          <p class="helper">جرّب التغيير وشاهد النتيجة مباشرة في المعاينة. زر «استعادة الأصل» يرجع كل شيء.</p>
+        </div>
+      </div>
+
+      <div class="panel" data-panel="security">
+        <div class="card">
+          <div class="card-head"><span class="card-dot"></span><h2>تغيير كلمة المرور</h2></div>
+          <div class="row"><label>كلمة المرور الجديدة</label><input class="field" id="newPw" placeholder="اكتب كلمة المرور الجديدة"></div>
+          <button class="btn btn-ghost" id="genPw">توليد السطر</button>
+          <div class="row" style="margin-top:1rem"><label>انسخ هذا السطر واستبدل به السطر المشابه في أعلى ملف <code>host-console/bigboss/index.html</code></label>
+            <textarea class="field" id="pwOut" readonly dir="ltr" placeholder="سيظهر السطر هنا"></textarea></div>
+          <p class="helper">
+            تنبيه مهم: هذه الحماية للستر فقط وليست حماية حقيقية — من يعرف الرابط ويفتح مصدر الصفحة يمكنه تجاوزها.
+            لكنها غير خطرة: هذه اللوحة لا تعدّل الموقع مباشرة، فأي تغيير يحتاج رفع الملف إلى الاستضافة بحسابك أنت.
+            لحماية فعلية، ضع حماية بكلمة مرور على المجلد من لوحة الاستضافة.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Preview ── -->
+    <div class="preview-pane">
+      <div class="preview-head">
+        <strong>معاينة حية</strong>
+        <div class="seg" id="langSeg">
+          <button class="on" data-plang="tr">Türkçe</button>
+          <button data-plang="ar">عربي</button>
+        </div>
+        <div class="seg" id="devSeg">
+          <button class="on" data-dev="desktop">🖥️</button>
+          <button data-dev="phone">📱</button>
+        </div>
+      </div>
+      <div class="preview-body">
+        <div class="frame-wrap" id="frameWrap">
+          <iframe id="preview" src="../../index.html" title="معاينة"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="filePicker" accept="image/*">
+<input type="file" id="jsonPicker" accept=".json,application/json">
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═════════ password (obscurity only) ═════════ */
+const PASSWORD_HASH = "709e5843";   // كلمة المرور الافتراضية: huzur2026
+function hash(s){let h=5381;for(let i=0;i<s.length;i++){h=(((h<<5)+h)^s.charCodeAt(i))>>>0}return h.toString(16)}
+
+const gate=document.getElementById("gate"), shell=document.getElementById("shell");
+document.getElementById("gateForm").addEventListener("submit",(e)=>{
+  e.preventDefault();
+  const val=document.getElementById("pw").value;
+  if(hash(val)===PASSWORD_HASH){
+    sessionStorage.setItem("hd-auth","1"); unlock();
+  }else{
+    document.getElementById("gateErr").textContent="كلمة المرور غير صحيحة";
+  }
+});
+function unlock(){gate.style.display="none";shell.classList.add("on");init()}
+if(sessionStorage.getItem("hd-auth")==="1") unlock();
+
+/* ═════════ state ═════════ */
+let DEFAULTS=null, DATA=null, booted=false;
+const frame=document.getElementById("preview");
+let previewLang="tr", frameReady=false;
+
+const FIELD_GROUPS=[
+  {title:"القائمة العلوية",keys:[
+    ["nav.home","الرئيسية"],["nav.services","خدماتنا"],["nav.gallery","أعمالنا"],
+    ["nav.about","من نحن"],["nav.contact","تواصل معنا"]]},
+  {title:"الواجهة الرئيسية",keys:[
+    ["hero.kicker","السطر الصغير فوق العنوان"],["hero.title","العنوان الكبير"],
+    ["hero.lede","الفقرة التعريفية"],["hero.cta1","زر الطلب"],["hero.cta2","زر الأعمال"]]},
+  {title:"قسم الخدمات",keys:[
+    ["services.kicker","السطر الصغير"],["services.title","عنوان القسم"],
+    ["services.s1.title","الخدمة ١ — العنوان"],["services.s1.desc","الخدمة ١ — الوصف"],
+    ["services.s2.title","الخدمة ٢ — العنوان"],["services.s2.desc","الخدمة ٢ — الوصف"],
+    ["services.s3.title","الخدمة ٣ — العنوان"],["services.s3.desc","الخدمة ٣ — الوصف"],
+    ["services.s4.title","الخدمة ٤ — العنوان"],["services.s4.desc","الخدمة ٤ — الوصف"],
+    ["services.s5.title","الخدمة ٥ — العنوان"],["services.s5.desc","الخدمة ٥ — الوصف"],
+    ["services.s6.title","الخدمة ٦ — العنوان"],["services.s6.desc","الخدمة ٦ — الوصف"]]},
+  {title:"قسم المعرض",keys:[["gallery.kicker","السطر الصغير"],["gallery.title","عنوان القسم"]]},
+  {title:"قسم من نحن",keys:[
+    ["about.kicker","السطر الصغير"],["about.title","عنوان القسم"],
+    ["about.p1","الفقرة الأولى"],["about.p2","الفقرة الثانية"],
+    ["about.v1.title","الميزة ١ — العنوان"],["about.v1.desc","الميزة ١ — الوصف"],
+    ["about.v2.title","الميزة ٢ — العنوان"],["about.v2.desc","الميزة ٢ — الوصف"],
+    ["about.v3.title","الميزة ٣ — العنوان"],["about.v3.desc","الميزة ٣ — الوصف"]]},
+  {title:"قسم التواصل",keys:[
+    ["contact.kicker","السطر الصغير"],["contact.title","عنوان القسم"],["contact.lede","الفقرة"],
+    ["contact.whatsapp","تسمية واتساب"],["contact.email","تسمية البريد"],
+    ["contact.instagram","تسمية إنستغرام"],["contact.phone","تسمية الاتصال"]]},
+  {title:"التذييل",keys:[["footer.slogan","الشعار النصي"],["footer.rights","حقوق النشر"]]},
+];
+
+const IMG_DEFS={
+  logo:{label:"الشعار الكبير (الواجهة)",max:900,mime:"image/png",cover:false},
+  logoMark:{label:"الشعار الصغير (الترويسة)",max:400,mime:"image/png",cover:false},
+  favicon:{label:"أيقونة التاب (Favicon)",max:256,mime:"image/png",cover:false},
+  ogImage:{label:"صورة المشاركة (واتساب/فيسبوك)",max:1200,mime:"image/jpeg",cover:true},
+  gallery1:{label:"صورة المعرض ١",max:1500,mime:"image/jpeg",cover:true},
+  gallery2:{label:"صورة المعرض ٢",max:1500,mime:"image/jpeg",cover:true},
+  gallery3:{label:"صورة المعرض ٣",max:1500,mime:"image/jpeg",cover:true},
+  gallery4:{label:"صورة المعرض ٤",max:1500,mime:"image/jpeg",cover:true},
+  gallery5:{label:"صورة المعرض ٥",max:1500,mime:"image/jpeg",cover:true},
+  gallery6:{label:"صورة المعرض ٦",max:1500,mime:"image/jpeg",cover:true},
+};
+
+/* ═════════ boot ═════════ */
+async function init(){
+  if(booted) return; booted=true;
+  try{
+    const res=await fetch("../../content.json",{cache:"no-store"});
+    if(!res.ok) throw new Error("http "+res.status);
+    DEFAULTS=await res.json();
+  }catch(e){
+    toast("تعذّر قراءة content.json — استورده يدوياً من زر «استيراد ملف»");
+    DEFAULTS={brand:{},images:{},contact:{},theme:{},meta:{},text:{ar:{},tr:{}}};
+  }
+  const draft=localStorage.getItem("hd-draft");
+  if(draft){
+    try{DATA=JSON.parse(draft);toast("تم استرجاع تعديلات لم تُحفظ")}catch(e){DATA=clone(DEFAULTS)}
+  }else DATA=clone(DEFAULTS);
+
+  buildTexts(); buildImages(); fillSimple(); wire(); pushPreview(); updateSize();
+}
+const clone=(o)=>JSON.parse(JSON.stringify(o));
+
+/* ═════════ build UI ═════════ */
+function buildTexts(){
+  const wrap=document.getElementById("textsPanel");
+  wrap.innerHTML="";
+  FIELD_GROUPS.forEach(group=>{
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML='<div class="card-head"><span class="card-dot"></span><h2>'+group.title+"</h2></div>";
+    group.keys.forEach(([key,label])=>{
+      const row=document.createElement("div");
+      row.className="row";
+      const long=(DATA.text?.tr?.[key]||"").length>60;
+      const tag=(l,c)=>'<span class="tag tag-'+c+'">'+l+"</span>";
+      row.innerHTML='<label>'+label+"</label><div class='bi'>"+
+        "<div>"+tag("TR","tr")+(long?"<textarea":"<input")+' class="field" data-text="tr|'+key+'"'+(long?"></textarea>":">")+"</div>"+
+        "<div>"+tag("AR","ar")+(long?"<textarea":"<input")+' class="field" dir="rtl" data-text="ar|'+key+'"'+(long?"></textarea>":">")+"</div>";
+      card.appendChild(row);
+    });
+    wrap.appendChild(card);
+  });
+  // fill values
+  document.querySelectorAll("[data-text]").forEach(node=>{
+    const [lang,key]=node.dataset.text.split("|");
+    node.value=DATA.text?.[lang]?.[key] ?? "";
+    node.addEventListener("input",()=>{
+      DATA.text=DATA.text||{}; DATA.text[lang]=DATA.text[lang]||{};
+      DATA.text[lang][key]=node.value;
+      schedule();
+    });
+  });
+}
+
+function imgRow(key){
+  const def=IMG_DEFS[key];
+  const src=DATA.images?.[key]||"";
+  const row=document.createElement("div");
+  row.className="img-row";
+  const isData=src.startsWith("data:");
+  row.innerHTML=
+    '<div class="img-thumb'+(def.cover?" cover":"")+'"><img src="'+(src||"../../assets/placeholder.svg")+'" alt="" onerror="this.src=\'../../assets/placeholder.svg\'"></div>'+
+    '<div class="img-info"><strong>'+def.label+"</strong><small>"+(isData?"صورة مرفوعة ("+Math.round(src.length/1365)+" ك.ب)":src||"—")+"</small></div>"+
+    '<div class="img-actions"><button class="btn btn-gold" data-up="'+key+'">رفع صورة</button>'+
+    '<button class="btn btn-plain" data-rst="'+key+'">الأصل</button></div>';
+  row.querySelector("[data-up]").addEventListener("click",()=>pickImage(key));
+  row.querySelector("[data-rst]").addEventListener("click",()=>{
+    DATA.images[key]=DEFAULTS.images?.[key]||"";
+    buildImages(); schedule(); toast("تمت الاستعادة");
+  });
+  return row;
+}
+
+function buildImages(){
+  const logos=document.getElementById("logoRows");
+  const gal=document.getElementById("galleryRows");
+  const meta=document.getElementById("metaImgRows");
+  logos.innerHTML="";gal.innerHTML="";meta.innerHTML="";
+  ["logo","logoMark"].forEach(k=>logos.appendChild(imgRow(k)));
+  ["favicon","ogImage"].forEach(k=>meta.appendChild(imgRow(k)));
+  ["gallery1","gallery2","gallery3","gallery4","gallery5","gallery6"].forEach(k=>gal.appendChild(imgRow(k)));
+}
+
+function fillSimple(){
+  document.querySelectorAll("[data-meta]").forEach(n=>{
+    n.value=DATA.meta?.[n.dataset.meta]??"";
+    n.addEventListener("input",()=>{DATA.meta=DATA.meta||{};DATA.meta[n.dataset.meta]=n.value;schedule()});
+  });
+  document.querySelectorAll("[data-brand]").forEach(n=>{
+    n.value=DATA.brand?.[n.dataset.brand]??"";
+    n.addEventListener("input",()=>{DATA.brand=DATA.brand||{};DATA.brand[n.dataset.brand]=n.value;schedule()});
+  });
+  document.querySelectorAll("[data-contact]").forEach(n=>{
+    n.value=DATA.contact?.[n.dataset.contact]??"";
+    n.addEventListener("input",()=>{DATA.contact=DATA.contact||{};DATA.contact[n.dataset.contact]=n.value.trim();schedule()});
+  });
+  document.querySelectorAll("[data-theme]").forEach(n=>{
+    n.value=DATA.theme?.[n.dataset.theme]||"#000000";
+    n.addEventListener("input",()=>{DATA.theme=DATA.theme||{};DATA.theme[n.dataset.theme]=n.value;schedule()});
+  });
+}
+
+/* ═════════ image upload ═════════ */
+let pendingKey=null;
+const filePicker=document.getElementById("filePicker");
+function pickImage(key){pendingKey=key;filePicker.value="";filePicker.click()}
+filePicker.addEventListener("change",async()=>{
+  const file=filePicker.files[0]; if(!file||!pendingKey) return;
+  try{
+    const def=IMG_DEFS[pendingKey];
+    const dataUrl=file.type==="image/svg+xml"
+      ? await readAsDataURL(file)
+      : await resize(file,def.max,def.mime);
+    DATA.images=DATA.images||{}; DATA.images[pendingKey]=dataUrl;
+    buildImages(); schedule(); toast("تم رفع الصورة ✓");
+  }catch(e){toast("تعذّر قراءة الصورة")}
+});
+const readAsDataURL=(file)=>new Promise((res,rej)=>{
+  const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);
+});
+async function resize(file,max,mime){
+  const url=await readAsDataURL(file);
+  const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});
+  let w=img.naturalWidth,h=img.naturalHeight;
+  const scale=Math.min(1,max/Math.max(w,h));
+  w=Math.max(1,Math.round(w*scale));h=Math.max(1,Math.round(h*scale));
+  const c=document.createElement("canvas");c.width=w;c.height=h;
+  const ctx=c.getContext("2d");
+  if(mime==="image/jpeg"){ctx.fillStyle="#fff";ctx.fillRect(0,0,w,h)}
+  ctx.drawImage(img,0,0,w,h);
+  return c.toDataURL(mime,mime==="image/jpeg"?0.82:undefined);
+}
+
+/* ═════════ preview + persistence ═════════ */
+let timer=null;
+function schedule(){clearTimeout(timer);timer=setTimeout(()=>{pushPreview();saveDraft();updateSize()},220)}
+function pushPreview(){
+  if(!frameReady||!DATA) return;
+  frame.contentWindow.postMessage({type:"huzur:content",content:DATA,lang:previewLang},"*");
+}
+frame.addEventListener("load",()=>{frameReady=true;setTimeout(pushPreview,120)});
+function saveDraft(){try{localStorage.setItem("hd-draft",JSON.stringify(DATA))}catch(e){}}
+function updateSize(){
+  const kb=Math.round(JSON.stringify(DATA).length/1024);
+  const pill=document.getElementById("sizePill");
+  pill.textContent="حجم الملف: "+(kb>1024?(kb/1024).toFixed(1)+" م.ب":kb+" ك.ب");
+  pill.classList.toggle("warn",kb>4096);
+}
+
+/* ═════════ wiring ═════════ */
+function wire(){
+  document.getElementById("tabs").addEventListener("click",(e)=>{
+    const btn=e.target.closest(".tab"); if(!btn) return;
+    document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t===btn));
+    document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.dataset.panel===btn.dataset.tab));
+  });
+
+  document.getElementById("langSeg").addEventListener("click",(e)=>{
+    const b=e.target.closest("[data-plang]"); if(!b) return;
+    previewLang=b.dataset.plang;
+    document.querySelectorAll("[data-plang]").forEach(x=>x.classList.toggle("on",x===b));
+    pushPreview();
+  });
+  document.getElementById("devSeg").addEventListener("click",(e)=>{
+    const b=e.target.closest("[data-dev]"); if(!b) return;
+    document.querySelectorAll("[data-dev]").forEach(x=>x.classList.toggle("on",x===b));
+    document.getElementById("frameWrap").classList.toggle("phone",b.dataset.dev==="phone");
+  });
+
+  document.getElementById("saveBtn").addEventListener("click",()=>{
+    const blob=new Blob([JSON.stringify(DATA,null,2)],{type:"application/json"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob); a.download="content.json"; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    toast("تم تنزيل content.json — ارفعه إلى مجلد الموقع");
+  });
+
+  const jsonPicker=document.getElementById("jsonPicker");
+  document.getElementById("importBtn").addEventListener("click",()=>{jsonPicker.value="";jsonPicker.click()});
+  jsonPicker.addEventListener("change",async()=>{
+    const f=jsonPicker.files[0]; if(!f) return;
+    try{
+      DATA=JSON.parse(await f.text());
+      buildTexts();buildImages();fillSimple();schedule();toast("تم استيراد الملف ✓");
+    }catch(e){toast("الملف غير صالح")}
+  });
+
+  document.getElementById("resetBtn").addEventListener("click",()=>{
+    if(!confirm("استعادة كل شيء إلى الحالة الأصلية؟ ستفقد تعديلاتك غير المحفوظة.")) return;
+    DATA=clone(DEFAULTS); localStorage.removeItem("hd-draft");
+    buildTexts();buildImages();fillSimple();schedule();toast("تمت الاستعادة");
+  });
+
+  document.getElementById("genPw").addEventListener("click",()=>{
+    const v=document.getElementById("newPw").value;
+    if(!v) return toast("اكتب كلمة المرور أولاً");
+    document.getElementById("pwOut").value=
+      'const PASSWORD_HASH = "'+hash(v)+'";   // كلمة المرور: '+v;
+    toast("انسخ السطر واستبدله في الملف");
+  });
+
+  window.addEventListener("beforeunload",saveDraft);
+}
+
+/* ═════════ toast ═════════ */
+let toastTimer=null;
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.classList.add("on");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("on"),2600);
+}
+</script>
+</body>
+</html>
