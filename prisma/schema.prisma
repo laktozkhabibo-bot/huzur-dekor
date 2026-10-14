@@ -1,0 +1,80 @@
+// Huzur Dekor — database schema
+// Localized fields (title, description…) are stored as JSON: { "tr": "...", "en": "...", "ar": "..." }
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Project categories (Mutfak, Salon, TV Üniteleri…) — the filter tabs on /projeler
+model Category {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  name      Json
+  sortOrder Int       @default(0)
+  projects  Project[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// A finished work shown in the portfolio
+model Project {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       Json
+  description Json
+  location    String    @default("")
+  year        String    @default("")
+  images      String[]
+  visible     Boolean   @default(true)
+  featured    Boolean   @default(false)
+  sortOrder   Int       @default(0)
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([categoryId])
+  @@index([visible, featured])
+}
+
+// Key/value store for every editable site text & setting (hero, services, about, contact…)
+model SiteSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+// Single-row table holding the host panel password hash
+model AdminCredential {
+  id           Int      @id @default(1)
+  passwordHash String
+  // Incremented on every password change → invalidates all existing sessions
+  tokenVersion Int      @default(1)
+  updatedAt    DateTime @updatedAt
+}
+
+// Login rate limiting (works across serverless instances)
+model LoginAttempt {
+  key         String    @id // hashed IP
+  count       Int       @default(0)
+  windowStart DateTime  @default(now())
+  lockedUntil DateTime?
+}
+
+// Quote / contact requests from the website
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String
+  email     String   @default("")
+  service   String   @default("")
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
